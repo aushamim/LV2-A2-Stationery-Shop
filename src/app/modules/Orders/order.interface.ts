@@ -11,7 +11,7 @@ export interface OrderInterface {
 
 // Zod order validation schema
 export const OrderValidationSchema = z.object({
-  email      : z.string({ required_error: "Name is required", invalid_type_error: "Name must be a string" }),
+  email      : z.string({ required_error: "Name is required", invalid_type_error: "Invalid email" }).email({ message: "Invalid email" }),
   product    : z.string({ required_error: "Product ID is required", invalid_type_error: "Product ID must be a string" }),
   quantity   : z.number({ required_error: "Quantity is required", invalid_type_error: "Quantity must be a number" }),
   totalPrice : z.number({ required_error: "totalPrice is required", invalid_type_error: "totalPrice must be a number" }),
