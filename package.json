@@ -10,7 +10,8 @@
     "lint": "eslint",
     "lint:fix": "eslint --fix",
     "format": "prettier --ignore-path .gitignore --write \"**/*.+(js|ts|json)\"",
-    "release": "yarn format && yarn lint:fix && yarn lint && yarn build"
+    "deploy": "npx vercel --prod",
+    "release": "yarn format && yarn lint:fix && yarn lint && yarn build && yarn deploy"
   },
   "author": "Shamim",
   "license": "ISC",
