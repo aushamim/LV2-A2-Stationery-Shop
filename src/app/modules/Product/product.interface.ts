@@ -15,20 +15,6 @@ export interface ProductInterface {
 // Partial product interface/type
 export type PartialProductInterface = Partial<ProductInterface>;
 
-// Model Schema
-export const ProductSchema = new Schema<ProductInterface>(
-  {
-    name        : { type: String, required: true },
-    brand       : { type: String, required: true },
-    description : { type: String, required: true },
-    category    : { type: String, enum: ["Writing", "Office Supplies", "Art Supplies", "Educational", "Technology"], required: true },
-    price       : { type: Number, required: true },
-    quantity    : { type: Number, required: true },
-    inStock     : { type: Boolean },
-  },
-  { timestamps: true },
-); // prettier-ignore
-
 // Zod product validation schema
 export const ProductValidationSchema = z.object({
   name        : z.string({ required_error: "Name is required", invalid_type_error: "Name must be a string" }),
@@ -42,3 +28,17 @@ export const ProductValidationSchema = z.object({
 
 // Zod partial product validation schema
 export const PartialProductValidationSchema = ProductValidationSchema.partial();
+
+// Model Schema
+export const ProductSchema = new Schema<ProductInterface>(
+  {
+    name        : { type: String, required: true },
+    brand       : { type: String, required: true },
+    description : { type: String, required: true },
+    category    : { type: String, enum: ["Writing", "Office Supplies", "Art Supplies", "Educational", "Technology"], required: true },
+    price       : { type: Number, required: true },
+    quantity    : { type: Number, required: true },
+    inStock     : { type: Boolean },
+  },
+  { timestamps: true },
+); // prettier-ignore

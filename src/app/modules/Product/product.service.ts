@@ -1,7 +1,7 @@
 import { PartialProductInterface, ProductInterface } from "./product.interface";
 import { ProductModel } from "./product.model";
 
-const getAllProductsFromDB = async (searchTerm: string | null = null) => {
+const getAll = async (searchTerm: string | null = null) => {
   const query = searchTerm
     ? {
         $or: [
@@ -14,20 +14,20 @@ const getAllProductsFromDB = async (searchTerm: string | null = null) => {
   return await ProductModel.find(query);
 };
 
-const getProductFromDB = async (id: string) => {
+const getOne = async (id: string) => {
   return await ProductModel.findOne({ _id: id });
 };
 
-const createProductInDB = async (product: ProductInterface) => {
+const create = async (product: ProductInterface) => {
   return await ProductModel.create(product);
 };
 
-const updateProductInDB = async (id: string, product: PartialProductInterface) => {
+const update = async (id: string, product: PartialProductInterface) => {
   return await ProductModel.updateOne({ _id: id }, product);
 };
 
-const deleteProductFromDB = async (id: string) => {
+const deleteOne = async (id: string) => {
   return await ProductModel.deleteOne({ _id: id });
 };
 
-export { getAllProductsFromDB, getProductFromDB, createProductInDB, updateProductInDB, deleteProductFromDB };
+export const ProductDB = { getAll, getOne, create, update, deleteOne };
