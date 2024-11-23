@@ -10,7 +10,7 @@
     "lint": "eslint",
     "lint:fix": "eslint --fix",
     "format": "prettier --ignore-path .gitignore --write \"**/*.+(js|ts|json)\"",
-    "release": "yarn lint && yarn format && yarn build"
+    "release": "yarn format && yarn lint:fix && yarn lint && yarn build"
   },
   "author": "Shamim",
   "license": "ISC",
@@ -23,7 +23,9 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.15.0",
+    "@stylistic/eslint-plugin-js": "^2.11.0",
     "@types/cors": "^2.8.17",
+    "@types/eslint-config-prettier": "^6.11.3",
     "@types/express": "^5.0.0",
     "@types/node": "*",
     "@typescript-eslint/eslint-plugin": "^8.15.0",
