@@ -13,7 +13,8 @@ app.use("/api/products", ProductRoutes);
 app.use("/api/orders", OrderRoutes);
 
 app.get("/", (req: Request, res: Response) => {
-  res.send("Hello! Welcome to Stationery Shop Server");
+  const content = "<div><h1>Hello! Welcome to Stationery Shop Server</h1><h4>Read API documentation <a href='/docs'>here</a></h4></div>";
+  res.send(content);
 });
 
 export default app;
