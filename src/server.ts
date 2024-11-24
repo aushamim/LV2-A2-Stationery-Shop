@@ -2,7 +2,6 @@
 import mongoose from "mongoose";
 import config from "./app/config";
 import app from "./app";
-import swaggerDocs from "./app/utils/swagger";
 
 async function main() {
   try {
@@ -12,7 +11,6 @@ async function main() {
     // Start API
     app.listen(config.port, () => {
       console.log(`Stationary Shop listening on port ${config.port} \nURL: http://localhost:${config.port}/`);
-      swaggerDocs(app);
     });
   } catch (err) {
     console.log(err);
