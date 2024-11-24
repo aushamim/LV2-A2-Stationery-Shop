@@ -52,7 +52,14 @@ paths:
   /api/products:
     get:
       description: ""
-      parameters: []
+      parameters:
+        - name: searchTerm
+          in: query
+          required: false
+          description: Term to search for in product name, description, or category
+          schema:
+            type: string
+            example: "Office"
       tags:
         - Products
       responses:
