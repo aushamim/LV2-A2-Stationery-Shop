@@ -1,6 +1,23 @@
 import { Express, Request, Response } from "express";
 import path from "path";
 
+// import swaggerUi from "swagger-ui-express";
+// import { version } from "../../../package.json";
+// import swaggerJsdoc from "swagger-jsdoc";
+
+// const options: swaggerJsdoc.Options = {
+//   definition: {
+//     openapi: "3.0.3",
+//     info: {
+//       title: "Stationery Shop API Docs",
+//       version,
+//     },
+//   },
+//   apis: ["dist/app/docs/*.yml"],
+// };
+
+// const swaggerSpec = swaggerJsdoc(options);
+
 export function swaggerDocs(app: Express) {
   // Docs JSON
   app.get("/docs.json", (req: Request, res: Response) => {
