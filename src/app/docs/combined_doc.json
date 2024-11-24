@@ -1,0 +1,360 @@
+{
+  "openapi": "3.0.3",
+  "info": { "title": "Stationery Shop API Docs", "version": "1.0.0" },
+  "paths": {
+    "openapi": { "0": "3", "1": ".", "2": "0", "3": ".", "4": "3" },
+    "info": { "title": "API Title", "version": "1.0" },
+    "/api/orders": {
+      "post": {
+        "tags": ["Orders"],
+        "requestBody": { "description": "Order data", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Order" } } } },
+        "responses": {
+          "200": {
+            "description": "Order created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string", "example": "Product created successfully" },
+                    "status": { "type": "boolean", "example": true },
+                    "data": { "$ref": "#/components/schemas/Order" }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Order creation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string", "example": "Order creation failed" },
+                    "status": { "type": "boolean", "example": false },
+                    "error": { "type": "object", "properties": { "message": { "type": "string", "example": "ValidationError" } } },
+                    "stack": { "type": "string", "example": "Error: Something went wrong\n    at app.js:23:13\n    at..." }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/orders/revenue": {
+      "get": {
+        "tags": ["Orders"],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Revenue calculated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string", "example": "Revenue calculated successfully" },
+                    "status": { "type": "boolean", "example": true },
+                    "data": { "properties": { "totalRevenue": { "type": "number", "example": 720 } } }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Revenue calculation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string", "example": "Revenue calculation failed" },
+                    "status": { "type": "boolean", "example": false },
+                    "error": { "type": "object", "properties": { "message": { "type": "string", "example": "Revenue calculation failed" } } },
+                    "stack": { "type": "string", "example": "Error: Something went wrong\n    at app.js:23:13\n    at..." }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/products": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "searchTerm",
+            "in": "query",
+            "required": false,
+            "description": "Term to search for in product name, description, or category",
+            "schema": { "type": "string", "example": "Office" }
+          }
+        ],
+        "tags": ["Products"],
+        "responses": {
+          "200": {
+            "description": "List of products",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string", "example": "Products retrieved successfully" },
+                    "status": { "type": "boolean", "example": true },
+                    "data": { "type": "array", "items": { "$ref": "#/components/schemas/Product" } }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Failed to get products",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string", "example": "Failed to get products" },
+                    "status": { "type": "boolean", "example": false },
+                    "error": { "type": "object", "properties": { "message": { "type": "string", "example": "ValidationError" } } },
+                    "stack": { "type": "string", "example": "Error: Something went wrong\n    at app.js:23:13\n    at..." }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Products"],
+        "requestBody": { "description": "Product data", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Product" } } } },
+        "responses": {
+          "200": {
+            "description": "Product created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string", "example": "Product created successfully" },
+                    "status": { "type": "boolean", "example": true },
+                    "data": { "$ref": "#/components/schemas/Product" }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Product creation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string", "example": "Invalid input data" },
+                    "status": { "type": "boolean", "example": false },
+                    "error": { "type": "object", "properties": { "message": { "type": "string", "example": "ValidationError" } } },
+                    "stack": { "type": "string", "example": "Error: Something went wrong\n    at app.js:23:13\n    at..." }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/products/{productId}": {
+      "get": {
+        "tags": ["Products"],
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the product to retrieve",
+            "schema": { "type": "string", "example": "648a45e5f0123c45678d9012" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Product retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": { "type": "boolean", "example": true },
+                    "message": { "type": "string", "example": "Product retrieved successfully" },
+                    "data": { "$ref": "#/components/schemas/Product" }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Product not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": { "type": "boolean", "example": false },
+                    "message": { "type": "string", "example": "Failed to get product" },
+                    "error": { "type": "object", "properties": { "message": { "type": "string", "example": "Product not found" } } },
+                    "stack": { "type": "string", "example": "Error: Something went wrong\n    at app.js:23:13\n    at..." }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["Products"],
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the product to update",
+            "schema": { "type": "string", "example": "648a45e5f0123c45678d9012" }
+          }
+        ],
+        "requestBody": {
+          "description": "Product object with the updated details",
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Product" } } }
+        },
+        "responses": {
+          "200": {
+            "description": "Product updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": { "type": "boolean", "example": true },
+                    "message": { "type": "string", "example": "Product updated successfully" },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "acknowledged": { "type": "boolean", "example": true },
+                        "modifiedCount": { "type": "integer", "example": 1 },
+                        "matchedCount": { "type": "integer", "example": 1 }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Failed to update the product",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string", "example": "Invalid input data" },
+                    "status": { "type": "boolean", "example": false },
+                    "error": { "type": "object", "properties": { "message": { "type": "string", "example": "ValidationError" } } },
+                    "stack": { "type": "string", "example": "Error: Something went wrong\n    at app.js:23:13\n    at..." }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Products"],
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the product to delete",
+            "schema": { "type": "string", "example": "648a45e5f0123c45678d9012" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Product updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": { "type": "boolean", "example": true },
+                    "message": { "type": "string", "example": "Product deleted successfully" },
+                    "data": {
+                      "type": "object",
+                      "properties": { "acknowledged": { "type": "boolean", "example": true }, "deletedCount": { "type": "integer", "example": 1 } }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Failed to delete the product",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string", "example": "Invalid input data" },
+                    "status": { "type": "boolean", "example": false },
+                    "error": { "type": "object", "properties": { "message": { "type": "string", "example": "CastError" } } },
+                    "stack": { "type": "string", "example": "Error: Something went wrong\n    at app.js:23:13\n    at..." }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Order": {
+        "type": "object",
+        "required": ["email", "product", "quantity", "totalPrice"],
+        "properties": {
+          "_id": { "type": "string", "example": "648b45f5e1234b56789a6789" },
+          "email": { "type": "string", "example": "customer@example.com" },
+          "product": { "type": "string", "example": "648a45e5f0123c45678d9012" },
+          "quantity": { "type": "integer", "example": 2 },
+          "totalPrice": { "type": "number", "example": 36 },
+          "createdAt": { "type": "string", "example": "2024-11-19T10:23:45.123Z" },
+          "updatedAt": { "type": "string", "example": "2024-11-19T10:23:45.123Z" }
+        }
+      },
+      "Product": {
+        "type": "object",
+        "required": ["name", "brand", "category", "price", "quantity", "inStock"],
+        "properties": {
+          "_id": { "type": "string", "example": "648a45e5f0123c45678d9012" },
+          "name": { "type": "string", "example": "Notebook" },
+          "brand": { "type": "string", "example": "Moleskine" },
+          "price": { "type": "number", "example": 15 },
+          "category": {
+            "type": "string",
+            "enum": ["Writing", "Office Supplies", "Art Supplies", "Educational", "Technology"],
+            "example": "Office Supplies"
+          },
+          "description": { "type": "string", "example": "A high-quality notebook for professionals." },
+          "quantity": { "type": "integer", "example": 200 },
+          "inStock": { "type": "boolean", "example": true },
+          "createdAt": { "type": "string", "example": "2024-11-19T10:23:45.123Z" },
+          "updatedAt": { "type": "string", "example": "2024-11-19T10:23:45.123Z" }
+        }
+      }
+    }
+  },
+  "tags": [{ "name": "Orders" }, { "name": "Products" }]
+}

@@ -2,8 +2,11 @@ import express, { Request, Response } from "express";
 import cors from "cors";
 import { ProductRoutes } from "./app/modules/Product/product.routes";
 import { OrderRoutes } from "./app/modules/Orders/order.routes";
+import { swaggerDocs } from "./app/utils/swagger";
 
 const app = express();
+
+swaggerDocs(app);
 
 // Parsers
 app.use(express.json());

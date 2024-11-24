@@ -1,28 +1,21 @@
 import { Express, Request, Response } from "express";
-import { version } from "../../../package.json";
-import swaggerJsdoc from "swagger-jsdoc";
-import swaggerUi from "swagger-ui-express";
-import config from "../config";
-
-const options: swaggerJsdoc.Options = {
-  definition: {
-    openapi: "3.1.0",
-    info: {
-      title: "Stationery Shop API Docs",
-      version,
-    },
-  },
-  apis: [config.production ? "dist/app/docs/*.yml" : "src/app/docs/*.yml"],
-};
-
-export const swaggerSpec = swaggerJsdoc(options);
+import path from "path";
 
 export function swaggerDocs(app: Express) {
-  // Docs Page
-  app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-
+  // Docs JSON
   app.get("/docs.json", (req: Request, res: Response) => {
+    const combinedDoc = path.join(__dirname, "../docs/combined_doc.json");
     res.setHeader("Content-Type", "application/json");
-    res.send(swaggerSpec);
+    res.sendFile(combinedDoc);
+  });
+
+  // Docs Page
+  app.get("/docs", (req: Request, res: Response) => {
+    const swaggerFile = path.join(__dirname, "../docs/swagger.html");
+    res.sendFile(swaggerFile, (err) => {
+      if (err) {
+        res.status(500).send("Failed to load Swagger UI.");
+      }
+    });
   });
 }
