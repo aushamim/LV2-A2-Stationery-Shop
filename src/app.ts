@@ -2,8 +2,6 @@ import express, { Request, Response } from "express";
 import cors from "cors";
 import { ProductRoutes } from "./app/modules/Product/product.routes";
 import { OrderRoutes } from "./app/modules/Orders/order.routes";
-import swaggerUi from "swagger-ui-express";
-import { swaggerSpec } from "./app/utils/swagger";
 
 const app = express();
 
@@ -14,7 +12,6 @@ app.use(cors());
 // App routes
 app.use("/api/products", ProductRoutes);
 app.use("/api/orders", OrderRoutes);
-app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.get("/", (req: Request, res: Response) => {
   const content = "<div><h1>Hello! Welcome to Stationery Shop Server</h1><h4>Read API documentation <a href='/docs'>here</a></h4></div>";
