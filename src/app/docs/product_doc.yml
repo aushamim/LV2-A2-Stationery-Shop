@@ -1,0 +1,316 @@
+tags:
+  - name: Products
+components:
+  schemas:
+    Product:
+      type: object
+      required:
+        - name
+        - brand
+        - category
+        - price
+        - quantity
+        - inStock
+      properties:
+        _id:
+          type: string
+          example: "648a45e5f0123c45678d9012"
+        name:
+          type: string
+          example: "Notebook"
+        brand:
+          type: string
+          example: "Moleskine"
+        price:
+          type: number
+          example: 15
+        category:
+          type: string
+          enum:
+            - Writing
+            - Office Supplies
+            - Art Supplies
+            - Educational
+            - Technology
+          example: "Office Supplies"
+        description:
+          type: string
+          example: "A high-quality notebook for professionals."
+        quantity:
+          type: integer
+          example: 200
+        inStock:
+          type: boolean
+          example: true
+        createdAt:
+          type: string
+          example: "2024-11-19T10:23:45.123Z"
+        updatedAt:
+          type: string
+          example: "2024-11-19T10:23:45.123Z"
+paths:
+  /api/products:
+    get:
+      description: ""
+      parameters: []
+      tags:
+        - Products
+      responses:
+        "200":
+          description: List of products
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Products retrieved successfully"
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Product"
+        "404":
+          description: Failed to get products
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Failed to get products"
+                  status:
+                    type: boolean
+                    example: false
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: "ValidationError"
+                  stack:
+                    type: string
+                    example: "Error: Something went wrong\n    at app.js:23:13\n    at..."
+    post:
+      tags:
+        - Products
+      requestBody:
+        description: Product data
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Product"
+      responses:
+        "200":
+          description: Product created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Product created successfully"
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: "#/components/schemas/Product"
+        "500":
+          description: Product creation failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Invalid input data"
+                  status:
+                    type: boolean
+                    example: false
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: "ValidationError"
+                  stack:
+                    type: string
+                    example: "Error: Something went wrong\n    at app.js:23:13\n    at..."
+
+  /api/products/{productId}:
+    get:
+      tags:
+        - Products
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          description: The ID of the product to retrieve
+          schema:
+            type: string
+            example: "648a45e5f0123c45678d9012"
+      responses:
+        "200":
+          description: Product retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Product retrieved successfully"
+                  data:
+                    $ref: "#/components/schemas/Product"
+        "404":
+          description: Product not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Failed to get product"
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: "Product not found"
+                  stack:
+                    type: string
+                    example: "Error: Something went wrong\n    at app.js:23:13\n    at..."
+    put:
+      tags:
+        - Products
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          description: The ID of the product to update
+          schema:
+            type: string
+            example: "648a45e5f0123c45678d9012"
+      requestBody:
+        description: Product object with the updated details
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Product"
+      responses:
+        "200":
+          description: Product updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Product updated successfully"
+                  data:
+                    type: object
+                    properties:
+                      acknowledged:
+                        type: boolean
+                        example: true
+                      modifiedCount:
+                        type: integer
+                        example: 1
+                      matchedCount:
+                        type: integer
+                        example: 1
+        "500":
+          description: Failed to update the product
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Invalid input data"
+                  status:
+                    type: boolean
+                    example: false
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: "ValidationError"
+                  stack:
+                    type: string
+                    example: "Error: Something went wrong\n    at app.js:23:13\n    at..."
+    delete:
+      tags:
+        - Products
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          description: The ID of the product to delete
+          schema:
+            type: string
+            example: "648a45e5f0123c45678d9012"
+      responses:
+        "200":
+          description: Product updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Product deleted successfully"
+                  data:
+                    type: object
+                    properties:
+                      acknowledged:
+                        type: boolean
+                        example: true
+                      deletedCount:
+                        type: integer
+                        example: 1
+        "500":
+          description: Failed to delete the product
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Invalid input data"
+                  status:
+                    type: boolean
+                    example: false
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: "CastError"
+                  stack:
+                    type: string
+                    example: "Error: Something went wrong\n    at app.js:23:13\n    at..."
