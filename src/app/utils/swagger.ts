@@ -11,7 +11,7 @@ const options: swaggerJsdoc.Options = {
       version,
     },
   },
-  apis: ["src/app/docs/*.yml"],
+  apis: ["src/app/docs/*.yml", "dist/app/docs/*.yml"],
 };
 
 const swaggerSpec = swaggerJsdoc(options);
