@@ -12,7 +12,8 @@
     "lint:fix": "eslint --fix",
     "format": "prettier --ignore-path .gitignore --write \"**/*.+(js|ts|json)\"",
     "deploy": "npx vercel --prod",
-    "release": "yarn format && yarn lint:fix && yarn lint && yarn build && yarn deploy"
+    "release": "yarn format && yarn lint:fix && yarn lint && yarn build && yarn deploy",
+    "commit": "node ./node_modules/cz-customizable/standalone.js"
   },
   "author": "Shamim",
   "license": "ISC",
@@ -38,6 +39,7 @@
     "@types/swagger-ui-express": "^4.1.7",
     "@typescript-eslint/eslint-plugin": "^8.15.0",
     "@typescript-eslint/parser": "^8.15.0",
+    "cz-customizable": "^7.4.0",
     "eslint": "^9.15.0",
     "eslint-config-prettier": "^9.1.0",
     "globals": "^15.12.0",
