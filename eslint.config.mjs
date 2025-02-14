@@ -1,8 +1,8 @@
-import globals from "globals";
 import pluginJs from "@eslint/js";
-import tseslint from "typescript-eslint";
-import eslintPluginPrettier from "eslint-config-prettier";
 import stylistic from "@stylistic/eslint-plugin";
+import eslintPluginPrettier from "eslint-config-prettier";
+import globals from "globals";
+import tseslint from "typescript-eslint";
 
 /** @type {import('eslint').Linter.Config[]} */
 export default [
@@ -12,10 +12,10 @@ export default [
   { plugins: { "@stylistic": stylistic } },
   {
     rules: {
-      "no-undef"               : "error",
-      "prefer-const"           : "error",
-      "no-console"             : "warn",
-      "@stylistic/key-spacing" : ["warn", { align: { beforeColon: true } }],
+      "no-undef": "error",
+      "prefer-const": "error",
+      "no-console": "warn",
+      // "@stylistic/key-spacing" : ["warn", { align: { beforeColon: true } }],
     },
   },
   pluginJs.configs.recommended,
