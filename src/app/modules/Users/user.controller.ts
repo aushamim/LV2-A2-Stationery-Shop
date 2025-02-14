@@ -1,86 +1,116 @@
 import bcrypt from "bcrypt";
-import { Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import jwt, { SignOptions } from "jsonwebtoken";
+import { HydratedDocument } from "mongoose";
 import config from "../../config";
+import AppError from "../../errors/AppError";
+import catchAsync from "../../utils/catchAsync";
 import { handleResponse } from "../../utils/response";
-import { UserInterface, UserLoginInterface, UserValidationSchema } from "./user.interface";
+import { USER_ROLE, UserGetInterface, UserInterface, UserPartialInterface } from "./user.interface";
 import { UserDB } from "./user.service";
 
-// Register
-const register = async (req: Request, res: Response) => {
+const getUser = async (payload: UserGetInterface): Promise<HydratedDocument<UserInterface>> => {
   try {
-    const user: UserInterface = req.body;
-    const validatedUser = UserValidationSchema.parse(user);
-
-    const existingUser = await UserDB.getOne({ email: validatedUser.email });
-    if (existingUser) {
-      handleResponse(res, StatusCodes.CONFLICT, false, "User with the same email already exists.");
-    } else {
-      const { name, email, phone, address } = await UserDB.create(validatedUser);
-      handleResponse(res, StatusCodes.OK, true, "User registered successfully", { name, email, phone, address });
-    }
-  } catch (err) {
-    handleResponse(res, StatusCodes.INTERNAL_SERVER_ERROR, false, "User registration failed", undefined, err);
+    const user = await UserDB.getOne(payload);
+    if (!user) throw new AppError(StatusCodes.UNAUTHORIZED, "User not found");
+    return user;
+  } catch {
+    throw new AppError(StatusCodes.UNAUTHORIZED, "User not found");
   }
 };
 
 // Register
-const login = async (req: Request, res: Response) => {
-  try {
-    const user: UserLoginInterface = req.body;
-    const response = await UserDB.getOne({ email: user.email });
+const register = catchAsync(async (req, res) => {
+  const user = req.body;
+  const response = await UserDB.createOne(user);
+  const { _id, name, email } = response;
+  handleResponse(res, StatusCodes.CREATED, "User registered successfully", { _id, name, email });
+});
 
-    if (response && !response.inactive) {
-      const isPasswordMatched = await bcrypt.compare(user.password, response.password);
+// Login
+const login = catchAsync(async (req, res) => {
+  const user = req.body;
 
-      if (!isPasswordMatched) {
-        handleResponse(res, StatusCodes.UNAUTHORIZED, false, "Invalid credentials");
-      }
+  const payload = { email: user.email };
+  const response = await getUser(payload);
 
-      // token generation
-      const jwtData = { userId: response._id, role: response.role };
-      const accessToken = jwt.sign(jwtData, config.jwtAccessSecret as string, { expiresIn: config.jwtAccessExpire as string } as SignOptions);
-      const refreshToken = jwt.sign(jwtData, config.jwtRefreshSecret as string, { expiresIn: config.jwtRefreshExpire as string } as SignOptions);
+  if (!response) throw new AppError(StatusCodes.NOT_FOUND, "User not found");
+  if (response?.inactive) throw new AppError(StatusCodes.FORBIDDEN, "User is blocked");
 
-      res.cookie("refreshToken", refreshToken, { secure: config.production, httpOnly: true });
-
-      handleResponse(res, StatusCodes.OK, true, "User logged in successfully", { accessToken });
-    } else {
-      handleResponse(res, StatusCodes.OK, true, "User not found");
-    }
-  } catch (err) {
-    handleResponse(res, StatusCodes.INTERNAL_SERVER_ERROR, false, "User registration failed", undefined, err);
+  const isPasswordMatched = await bcrypt.compare(user.password, response.password);
+  if (!isPasswordMatched) {
+    throw new AppError(StatusCodes.UNAUTHORIZED, "Invalid credentials");
   }
-};
+
+  // token generation
+  const jwtData = { userId: response._id, role: response.role };
+  const accessToken = jwt.sign(jwtData, config.jwtAccessSecret as string, { expiresIn: config.jwtAccessExpire as string } as SignOptions);
+  const refreshToken = jwt.sign(jwtData, config.jwtRefreshSecret as string, { expiresIn: config.jwtRefreshExpire as string } as SignOptions);
+
+  res.cookie("refreshToken", refreshToken, { secure: config.production, httpOnly: true });
+
+  handleResponse(res, StatusCodes.OK, "User logged in successfully", { token: accessToken });
+});
+
+// Update User Data
+const updateUser = catchAsync(async (req, res) => {
+  const userId = req.params.userId;
+  const authUser = req.user;
+
+  if (authUser.role === USER_ROLE.ADMIN || authUser.userId === userId) {
+    const payload = req.body;
+    const response = await UserDB.updateOne(userId, payload);
+    if (response) {
+      const { name, email, address, phone } = response;
+      handleResponse(res, StatusCodes.OK, "Updated the user", { name, email, address, phone });
+    } else {
+      throw new AppError(StatusCodes.NOT_FOUND, "User not found. Update failed.");
+    }
+  } else {
+    throw new AppError(StatusCodes.UNAUTHORIZED, "You are not authorized");
+  }
+});
+
+// Update User Password
+const changePass = catchAsync(async (req, res) => {
+  const userId = req.params.userId;
+  const authUser = req.user;
+
+  if (authUser.userId === userId) {
+    const { oldPassword, newPassword } = req.body;
+    const user = await getUser({ _id: authUser.userId });
+
+    const isPasswordMatched = await bcrypt.compare(oldPassword, user.password);
+    if (!isPasswordMatched) {
+      throw new AppError(StatusCodes.UNAUTHORIZED, "Invalid credentials");
+    }
+
+    //Hash new password
+    const newHashedPassword = await bcrypt.hash(newPassword, Number(config.saltRounds));
+    await UserDB.updateOne(userId, { password: newHashedPassword });
+
+    handleResponse(res, StatusCodes.OK, "Password changed successfully");
+  } else {
+    throw new AppError(StatusCodes.UNAUTHORIZED, "You are not authorized");
+  }
+});
+
+// Activate User
+const activateUser = catchAsync(async (req, res) => {
+  const userId = req.params.userId;
+  const payload: UserPartialInterface = { inactive: false };
+  await UserDB.updateOne(userId, payload);
+
+  handleResponse(res, StatusCodes.OK, "Activated the user");
+});
 
 // Deactivate User
-const deactivateUser = async (req: Request, res: Response) => {
-  try {
-    const user: UserLoginInterface = req.body;
-    const response = await UserDB.getOne({ email: user.email });
+const deactivateUser = catchAsync(async (req, res) => {
+  const userId = req.params.userId;
+  const payload: UserPartialInterface = { inactive: true };
+  await UserDB.updateOne(userId, payload);
 
-    if (response && !response.inactive) {
-      const isPasswordMatched = await bcrypt.compare(user.password, response.password);
+  handleResponse(res, StatusCodes.OK, "Deactivated the user");
+});
 
-      if (!isPasswordMatched) {
-        handleResponse(res, StatusCodes.UNAUTHORIZED, false, "Invalid credentials");
-      }
-
-      // token generation
-      const jwtData = { userId: response._id, role: response.role };
-      const accessToken = jwt.sign(jwtData, config.jwtAccessSecret as string, { expiresIn: config.jwtAccessExpire as string } as SignOptions);
-      const refreshToken = jwt.sign(jwtData, config.jwtRefreshSecret as string, { expiresIn: config.jwtRefreshExpire as string } as SignOptions);
-
-      res.cookie("refreshToken", refreshToken, { secure: config.production, httpOnly: true });
-
-      handleResponse(res, StatusCodes.OK, true, "User logged in successfully", { accessToken });
-    } else {
-      handleResponse(res, StatusCodes.OK, true, "User not found");
-    }
-  } catch (err) {
-    handleResponse(res, StatusCodes.INTERNAL_SERVER_ERROR, false, "User registration failed", undefined, err);
-  }
-};
-
-export const UserController = { register, login };
+export const UserController = { getUser, register, login, updateUser, changePass, activateUser, deactivateUser };
