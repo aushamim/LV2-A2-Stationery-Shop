@@ -1,6 +1,6 @@
 import { StatusCodes } from "http-status-codes";
 import { ZodError, ZodIssue } from "zod";
-import { ErrorDataInterface } from "../error";
+import { ErrorDataInterface } from "./error";
 
 export const formatZodError = (err: ZodError): ErrorDataInterface => {
   const errorDetails = err?.issues?.map((issue: ZodIssue) => {
@@ -8,8 +8,8 @@ export const formatZodError = (err: ZodError): ErrorDataInterface => {
   });
 
   return {
-    statusCode   : StatusCodes.BAD_REQUEST,
-    message      : "Zod validation error",
-    errorDetails : errorDetails,
+    statusCode: StatusCodes.BAD_REQUEST,
+    message: "Zod validation error",
+    errorDetails: errorDetails,
   };
 };

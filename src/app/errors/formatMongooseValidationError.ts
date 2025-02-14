@@ -1,6 +1,6 @@
 import { StatusCodes } from "http-status-codes";
 import { Error } from "mongoose";
-import { ErrorDataInterface } from "../error";
+import { ErrorDataInterface } from "./error";
 
 export const formatMongooseValidationError = (err: Error.ValidationError): ErrorDataInterface => {
   const errorDetails = Object.values(err.errors).map((x) => {
@@ -12,8 +12,8 @@ export const formatMongooseValidationError = (err: Error.ValidationError): Error
   });
 
   return {
-    statusCode   : StatusCodes.BAD_REQUEST,
-    message      : err.message,
-    errorDetails : errorDetails,
+    statusCode: StatusCodes.BAD_REQUEST,
+    message: err.message,
+    errorDetails: errorDetails,
   };
 };

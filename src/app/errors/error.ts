@@ -2,12 +2,12 @@ import { Response } from "express";
 import { Error } from "mongoose";
 import { ZodError } from "zod";
 import config from "../config";
-import AppError from "./errors/AppError";
-import { formatAppError } from "./errors/formatAppError";
-import { formatMongoDuplicateKeyError } from "./errors/formatMongoDuplicateKeyError";
-import { formatMongooseCastError } from "./errors/formatMongooseCastError";
-import { formatMongooseValidationError } from "./errors/formatMongooseValidationError";
-import { formatZodError } from "./errors/formatZodError";
+import AppError from "./AppError";
+import { formatAppError } from "./formatAppError";
+import { formatMongoDuplicateKeyError } from "./formatMongoDuplicateKeyError";
+import { formatMongooseCastError } from "./formatMongooseCastError";
+import { formatMongooseValidationError } from "./formatMongooseValidationError";
+import { formatZodError } from "./formatZodError";
 
 export interface ErrorDataInterface {
   statusCode: number;
