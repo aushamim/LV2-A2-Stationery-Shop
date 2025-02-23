@@ -1,17 +1,14 @@
 import { PartialProductInterface, ProductInterface } from "./product.interface";
 import { ProductModel } from "./product.model";
+import QueryBuilder from "./product.querybuilder";
 
-const getAll = async (searchTerm: string | null = null) => {
-  const query = searchTerm
-    ? {
-        $or: [
-          { name: { $regex: searchTerm, $options: "i" } },
-          { brand: { $regex: searchTerm, $options: "i" } },
-          { category: { $regex: searchTerm, $options: "i" } },
-        ],
-      }
-    : {};
-  return await ProductModel.find(query);
+const getAll = async (searchTerm: Record<string, unknown>) => {
+  const query = new QueryBuilder(ProductModel.find(), searchTerm).search(["brand", "model", "category"]).filter().sort().paginate().fields();
+
+  const meta = await query.countTotal();
+  const result = await query.modelQuery;
+
+  return { meta, result };
 };
 
 const getOne = async (id: string) => {
@@ -23,11 +20,11 @@ const create = async (product: ProductInterface) => {
 };
 
 const update = async (id: string, product: PartialProductInterface) => {
-  return await ProductModel.updateOne({ _id: id }, product);
+  return await ProductModel.findByIdAndUpdate(id, product, { new: true });
 };
 
 const deleteOne = async (id: string) => {
-  return await ProductModel.deleteOne({ _id: id });
+  return await ProductModel.findByIdAndDelete(id);
 };
 
 export const ProductDB = { getAll, getOne, create, update, deleteOne };
