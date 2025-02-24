@@ -1,68 +1,62 @@
-import { Request, Response } from "express";
-import { OrderDB } from "./order.service";
+import { StatusCodes } from "http-status-codes";
+import catchAsync from "../../utils/catchAsync";
 import { handleResponse } from "../../utils/response";
-import { OrderInterface, OrderValidationSchema } from "./order.interface";
-import { ProductDB } from "../Product/product.service";
-import { ProductInterface } from "../Product/product.interface";
+import { OrderDB } from "./order.service";
 
-// Order Utilities
-const validatePrice = (order: OrderInterface, product: ProductInterface) => {
-  const totalPrice = product.price * order.quantity;
-  if (order.totalPrice !== totalPrice) {
-    throw new Error(`Invalid input: Wrong total price. Expected { totalPrice : ${totalPrice}}`);
-  }
-  return true;
-};
+// Verify payment
+const verifyPayment = catchAsync(async (req, res) => {
+  const response = await OrderDB.verifyPayment(req.query.order_id as string);
 
-const validateStock = (order: OrderInterface, product: ProductInterface) => {
-  if (!product.inStock || order.quantity > product.quantity) {
-    throw new Error("Insufficient stock");
-  }
-  return true;
-};
-
-const buyProduct = async (order: OrderInterface, product: ProductInterface) => {
-  const newProductQuantity = product.quantity - order.quantity;
-  const updateData = { quantity: newProductQuantity, inStock: newProductQuantity > 0 };
-  return await ProductDB.update(order.product, updateData);
-};
-
-const revertProduct = async (id: string, quantity: number) => {
-  const updateData = { quantity: quantity, inStock: quantity > 0 };
-  return await ProductDB.update(id, updateData);
-};
+  handleResponse(res, StatusCodes.CREATED, "Payment verified successfully", response);
+});
 
 // Create an order
-const create = async (req: Request, res: Response) => {
-  try {
-    const order = req.body;
-    const validatedOrder = OrderValidationSchema.parse(order);
+const create = catchAsync(async (req, res) => {
+  const user = req.user;
+  const orderData = req.body;
+  const response = await OrderDB.create(user, orderData, req.ip!);
 
-    const product = await ProductDB.getOne(validatedOrder.product);
-    if (!product) {
-      throw new Error("Product not found");
-    }
+  handleResponse(res, StatusCodes.CREATED, "Order placed successfully", response);
+});
 
-    if (validateStock(order, product) && validatePrice(order, product) && (await buyProduct(order, product)).acknowledged) {
-      const result = await OrderDB.create(validatedOrder);
-      handleResponse(res, 200, true, "Order created successfully", result);
-    } else {
-      revertProduct(product.id, product.quantity);
-      handleResponse(res, 500, false, "Order creation failed. Transaction reverted", undefined, { error: "Unknown error" });
-    }
-  } catch (err) {
-    handleResponse(res, 500, false, "Order creation failed", undefined, err);
-  }
-};
+// Get my orders
+const myOrders = catchAsync(async (req, res) => {
+  const { email } = req.user;
+  const response = await OrderDB.getOrdersByEmail(email);
 
-// Calculate revenue
-const revenue = async (req: Request, res: Response) => {
-  try {
-    const result = await OrderDB.revenue();
-    handleResponse(res, 200, true, "Revenue calculated successfully", result);
-  } catch (err) {
-    handleResponse(res, 500, false, "Revenue calculation failed", undefined, err);
-  }
-};
+  handleResponse(res, StatusCodes.OK, "Orders retrieved successfully", response);
+});
 
-export const OrderController = { create, revenue };
+// Get all orders
+const getAll = catchAsync(async (req, res) => {
+  const response = await OrderDB.getAll(req.query);
+
+  handleResponse(res, StatusCodes.OK, "Orders retrieved successfully", response);
+});
+
+// Get single order
+const getOne = catchAsync(async (req, res) => {
+  const { orderId } = req.params;
+  const response = await OrderDB.getOne(orderId);
+
+  handleResponse(res, StatusCodes.OK, "Order retrieved successfully", response);
+});
+
+// Update an order
+const updateOne = catchAsync(async (req, res) => {
+  const { orderId } = req.params;
+  const orderData = req.body;
+  const response = await OrderDB.updateOne(orderId, orderData);
+
+  handleResponse(res, StatusCodes.OK, "Order updated successfully", response);
+});
+
+// delete an order
+const deleteOne = catchAsync(async (req, res) => {
+  const { orderId } = req.params;
+  const response = await OrderDB.deleteOne(orderId);
+
+  handleResponse(res, StatusCodes.OK, "Order deleted successfully", response);
+});
+
+export const OrderController = { verifyPayment, create, myOrders, getAll, getOne, updateOne, deleteOne };

@@ -1,4 +1,3 @@
-import { Schema } from "mongoose";
 import { z } from "zod";
 
 // Product interface
@@ -28,17 +27,3 @@ export const ProductValidationSchema = z.object({
 
 // Zod partial product validation schema
 export const PartialProductValidationSchema = ProductValidationSchema.partial();
-
-// Model Schema
-export const ProductSchema = new Schema<ProductInterface>(
-  {
-    name        : { type: String, required: true },
-    brand       : { type: String, required: true },
-    description : { type: String, required: true },
-    category    : { type: String, enum: ["Writing", "Office Supplies", "Art Supplies", "Educational", "Technology"], required: true },
-    price       : { type: Number, required: true },
-    quantity    : { type: Number, required: true },
-    inStock     : { type: Boolean, required: true },
-  },
-  { timestamps: true },
-); // prettier-ignore
