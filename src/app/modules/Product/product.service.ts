@@ -1,6 +1,6 @@
+import QueryBuilder from "../../QueryBuilder/QueryBuildter";
 import { PartialProductInterface, ProductInterface } from "./product.interface";
 import { ProductModel } from "./product.model";
-import QueryBuilder from "./product.querybuilder";
 
 const getAll = async (searchTerm: Record<string, unknown>) => {
   const query = new QueryBuilder(ProductModel.find(), searchTerm).search(["brand", "model", "category"]).filter().sort().paginate().fields();

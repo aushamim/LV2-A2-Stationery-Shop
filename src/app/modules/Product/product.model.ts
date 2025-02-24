@@ -10,6 +10,7 @@ export const ProductSchema = new Schema<ProductInterface>(
     category: { type: String, enum: ["Writing", "Office Supplies", "Art Supplies", "Educational", "Technology"], required: true },
     price: { type: Number, required: true },
     quantity: { type: Number, required: true },
+    imgUrl: { type: String, required: true },
     inStock: { type: Boolean, required: true },
   },
   { timestamps: true },

@@ -8,6 +8,7 @@ export interface ProductInterface {
   category    : "Writing" | "Office Supplies" | "Art Supplies" | "Educational" | "Technology";
   price       : number;
   quantity    : number;
+  imgUrl      : string;
   inStock     : boolean;
 } // prettier-ignore
 
@@ -22,6 +23,7 @@ export const ProductValidationSchema = z.object({
   category    : z.enum(["Writing", "Office Supplies", "Art Supplies", "Educational", "Technology"], { required_error: "Category is required" }),
   price       : z.number({ required_error: "Price is required", invalid_type_error: "Price must be a number" }),
   quantity    : z.number({ required_error: "Quantity is required", invalid_type_error: "Quantity must be a number" }),
+  imgUrl      : z.string({ required_error: "Image URL is required", invalid_type_error: "Image URL be a string" }),
   inStock     : z.boolean({ required_error: "inStock is required", invalid_type_error: "inStock must be a either true or false" }),
 }); // prettier-ignore
 

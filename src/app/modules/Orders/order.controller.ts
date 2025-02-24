@@ -21,8 +21,8 @@ const create = catchAsync(async (req, res) => {
 
 // Get my orders
 const myOrders = catchAsync(async (req, res) => {
-  const { email } = req.user;
-  const response = await OrderDB.getOrdersByEmail(email);
+  const { userId } = req.user;
+  const response = await OrderDB.getOrdersByUserId(userId);
 
   handleResponse(res, StatusCodes.OK, "Orders retrieved successfully", response);
 });

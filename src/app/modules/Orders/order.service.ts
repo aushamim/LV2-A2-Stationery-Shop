@@ -1,30 +1,30 @@
 import { StatusCodes } from "http-status-codes";
 import { JwtPayload } from "jsonwebtoken";
 import AppError from "../../errors/AppError";
+import QueryBuilder from "../../QueryBuilder/QueryBuildter";
 import { ProductModel } from "../Product/product.model";
-import QueryBuilder from "../Product/product.querybuilder";
 import { UserModel } from "../Users/user.model";
 import { PartialOrderInterface } from "./order.interface";
 import { OrderModel } from "./order.model";
 import { OrderUtils } from "./order.utils";
 
-const create = async (user: JwtPayload, payload: { products: { product: string; quantity: number }[] }, client_ip: string) => {
-  const dbUser = await UserModel.findOne({ email: user.email });
+const create = async (user: JwtPayload, payload: { product: string; quantity: number }[], client_ip: string) => {
+  const dbUser = await UserModel.findById(user.userId);
 
-  if (!payload?.products?.length) {
+  if (!payload?.length) {
     throw new AppError(StatusCodes.NOT_ACCEPTABLE, "Order must contain at least one product.");
   }
 
   let totalPrice = 0;
 
-  const productIds = payload.products.map((p) => p.product);
+  const productIds = payload.map((p) => p.product);
 
   const dbProducts = await ProductModel.find({ _id: { $in: productIds } });
 
   const productMap = new Map(dbProducts.map((p) => [p._id.toString(), p]));
 
   // Check stock availability
-  for (const { product, quantity } of payload.products) {
+  for (const { product, quantity } of payload) {
     const dbProduct = productMap.get(product);
     if (!dbProduct) {
       throw new AppError(StatusCodes.NOT_FOUND, `Product with ID ${product} not found!`);
@@ -35,7 +35,7 @@ const create = async (user: JwtPayload, payload: { products: { product: string; 
   }
 
   // order placement
-  const orderedProducts = payload.products.map(({ product, quantity }) => {
+  const orderedProducts = payload.map(({ product, quantity }) => {
     const dbProduct = productMap.get(product)!;
     dbProduct.quantity -= quantity;
     dbProduct.inStock = dbProduct.quantity > 0;
@@ -79,12 +79,12 @@ const create = async (user: JwtPayload, payload: { products: { product: string; 
   return payment?.checkout_url;
 };
 
-const getOrdersByEmail = async (email: string) => {
-  const response = await OrderModel.find().populate<{ user: { email: string } }>("user").populate("products.product").sort({ createdAt: -1 });
+const getOrdersByUserId = async (userId: string) => {
+  const response = await OrderModel.find().populate("user").populate("products.product").sort({ createdAt: -1 });
 
   const filteredOrders = response.filter((order) => {
-    if (order.user && typeof order.user === "object" && "email" in order.user) {
-      return order.user.email === email;
+    if (order.user && typeof order.user === "object" && "_id" in order.user) {
+      return order.user._id.toString() === userId;
     }
     return false;
   });
@@ -162,4 +162,4 @@ const verifyPayment = async (id: string) => {
   return verifiedPayment;
 };
 
-export const OrderDB = { create, getOrdersByEmail, getAll, getOne, updateOne, deleteOne, verifyPayment };
+export const OrderDB = { create, getOrdersByUserId, getAll, getOne, updateOne, deleteOne, verifyPayment };
