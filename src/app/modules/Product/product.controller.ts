@@ -7,7 +7,7 @@ import { ProductDB } from "./product.service";
 const getAll = catchAsync(async (req, res) => {
   const result = await ProductDB.getAll(req.query);
 
-  handleResponse(res, StatusCodes.OK, "Products retrieved successfully", { data: result.result, meta: result.meta });
+  handleResponse(res, StatusCodes.OK, "Products retrieved successfully", { products: result.result, meta: result.meta });
 });
 
 // Get a single product
