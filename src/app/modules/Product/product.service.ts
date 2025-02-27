@@ -3,7 +3,7 @@ import { PartialProductInterface, ProductInterface } from "./product.interface";
 import { ProductModel } from "./product.model";
 
 const getAll = async (searchTerm: Record<string, unknown>) => {
-  const query = new QueryBuilder(ProductModel.find(), searchTerm).search(["brand", "model", "category"]).filter().sort().paginate().fields();
+  const query = new QueryBuilder(ProductModel.find(), searchTerm).search(["name", "brand", "category"]).filter().sort().paginate().fields();
 
   const meta = await query.countTotal();
   const result = await query.modelQuery;
