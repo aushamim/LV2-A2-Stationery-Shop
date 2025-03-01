@@ -19,6 +19,14 @@ const getUser = async (payload: UserGetInterface): Promise<HydratedDocument<User
   }
 };
 
+const getUserData = catchAsync(async (req, res) => {
+  const userId = req.params.userId;
+  const user = await getUser({ _id: userId });
+  const { name, email, address, phone } = user;
+
+  handleResponse(res, StatusCodes.OK, "User retrieved successfully", { name, email, address, phone });
+});
+
 // Register
 const register = catchAsync(async (req, res) => {
   const user = req.body;
@@ -113,4 +121,4 @@ const deactivateUser = catchAsync(async (req, res) => {
   handleResponse(res, StatusCodes.OK, "Deactivated the user");
 });
 
-export const UserController = { getUser, register, login, updateUser, changePass, activateUser, deactivateUser };
+export const UserController = { getUser, getUserData, register, login, updateUser, changePass, activateUser, deactivateUser };

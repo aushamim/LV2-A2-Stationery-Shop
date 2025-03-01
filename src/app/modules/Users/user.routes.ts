@@ -7,6 +7,9 @@ import { PasswordUpdateValidationSchema, UserLoginValidationSchema, UserUpdateVa
 
 const router = express.Router();
 
+// Get a User
+router.get("/user/:userId", UserController.getUserData);
+
 // Register User / Create User
 router.post("/auth/register", validateRequest(UserValidationSchema), UserController.register);
 
